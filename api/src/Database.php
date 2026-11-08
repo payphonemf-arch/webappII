@@ -52,6 +52,12 @@ final class Database
                         (3,'banana','$2y$10$p4NtG5moWE1RMUAupmSBn.bNHn2lD4uavGb9elKO2EG4NRyh/kdPS'),
                         (4,'admincpe','$2y$10$/cvHpJDUQNdxWLG2VsSKheAf2Yw8fpq3M2lohOd9oDqng3fgARrES')");
                 }
+
+                // One-time migration from the original demo password to the requested admincpe password.
+                $pdo->exec("UPDATE tb_users
+                    SET i_usr_pwd = '$2y$10$7XLVCLlFUFgjPwFhJN/X8uAFB/mX1f39r.MRHjr91vqG8A.0Aancm'
+                    WHERE i_usr_uname = 'admincpe'
+                      AND i_usr_pwd = '$2y$10$/cvHpJDUQNdxWLG2VsSKheAf2Yw8fpq3M2lohOd9oDqng3fgARrES'");
             }
         } catch (\Throwable $e) {
             error_log('Database schema initialization: ' . $e->getMessage());
