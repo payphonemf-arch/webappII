@@ -10,6 +10,7 @@
 - ดูคำสั่งซื้อและรายการสินค้า พร้อมข้อมูลลูกค้า พนักงาน และการจัดส่ง
 - รายงานคำสั่งซื้อและสินค้าขายดี พร้อมส่งออก CSV
 - Responsive layout สำหรับ desktop และมือถือ พร้อมเมนู emoji และ favicon
+- รองรับภาษา English และไทย โดยเริ่มต้นเป็น English และจำภาษาที่เลือกไว้
 - API ใช้ JWT Bearer token และมีเอกสาร OpenAPI/Swagger
 
 ## โครงสร้างโปรเจกต์
@@ -33,6 +34,7 @@ Web-app-II/
 │   ├── favicon.svg                # ไอคอนเว็บ
 │   └── assets/
 │       ├── css/app.css            # รูปแบบและ responsive layout
+│       ├── js/i18n.js             # สลับภาษา English/ไทย และบันทึกภาษาที่เลือก
 │       └── js/app.js              # หน้าจอ การนำทาง และการเรียก API
 ├── scripts/
 │   ├── dev.js                     # เริ่ม PHP development server
