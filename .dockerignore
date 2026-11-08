@@ -1,0 +1,11 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+recovered_db_northwind.sql
+image*.png
+node_modules
+vendor
+.phpunit.cache
+*.log

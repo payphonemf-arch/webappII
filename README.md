@@ -45,6 +45,32 @@ Web-app-II/
 └── package.json                   # คำสั่ง npm สำหรับรัน local
 ```
 
+## Deploy บน Render
+
+โปรเจกต์มี `Dockerfile` สำหรับ Render แล้ว ให้สร้างบริการแบบ **Web Service** จาก repository นี้ และตั้งค่า:
+
+```text
+Language: Docker
+Branch: main
+Root Directory: เว้นว่าง
+Build Command: เว้นว่าง
+Start Command: เว้นว่าง
+Compute: Free
+```
+
+เพิ่ม Environment Variables ใน Render:
+
+```text
+DB_HOST=<MySQL host ที่เปิด remote connection>
+DB_PORT=3306
+DB_NAME=<ชื่อฐานข้อมูลบน hosting>
+DB_USER=<ชื่อผู้ใช้ฐานข้อมูล>
+DB_PASS=<รหัสผ่านฐานข้อมูล>
+JWT_SECRET=<สุ่มค่าใหม่อย่างน้อย 32 ตัวอักษร>
+```
+
+Render ไม่มี MySQL ในตัว จึงต้องใช้ MySQL จากผู้ให้บริการอื่นที่อนุญาตให้ Render เชื่อมต่อผ่าน port 3306 แล้ว import `dbNorthwind.sql` ก่อนเปิดเว็บ
+
 ## API Endpoints
 
 Base path: `/api/v1` · ส่งและรับข้อมูลในรูปแบบ JSON · ทุก endpoint ต้องใช้ `Authorization: Bearer <token>` ยกเว้น `POST /auth/login`
@@ -76,19 +102,4 @@ Base path: `/api/v1` · ส่งและรับข้อมูลในร�
 
 > **หมายเหตุยอดขาย:** ฐานข้อมูลเดิมไม่ได้เก็บราคาต่อหน่วยในแต่ละรายการสั่งซื้อ ยอดใน Dashboard, รายงาน และ CSV จึงคำนวณจากราคาสินค้าปัจจุบันและเป็นค่าประมาณ
 
-## เริ่มใช้งานบนเครื่อง
 
-ต้องมี Node.js, PHP 8.1+ พร้อม PDO MySQL และ MySQL 8:
-
-1. สร้างฐานข้อมูล `db_northwind` แล้ว import `dbNorthwind.sql`.
-2. คัดลอก `.env.example` เป็น `.env` และกำหนดค่าฐานข้อมูลกับ `JWT_SECRET`.
-3. รัน `npm.cmd run dev` บน Windows หรือ `npm run dev` บน macOS/Linux.
-4. เปิด `http://127.0.0.1:8000`.
-
-ไม่มี `npm install` ที่ต้องทำสำหรับ development server นี้. ดูรายละเอียดเพิ่มเติมที่ [คู่มือติดตั้ง](docs/SETUP.md)
-
-ข้อมูลตัวอย่างมีบัญชี `admin` / `admin1234`, `mango` / `magno123` และ `banana` / `banana` โดย SQL เก็บรหัสผ่านเป็น hash เปลี่ยนบัญชีตัวอย่างและใช้ `JWT_SECRET` ที่สุ่มใหม่ก่อน deploy
-
-## Deploy
-
-ใช้ hosting ที่รองรับ PHP และ MySQL ตั้ง document root ไปที่โฟลเดอร์โปรเจกต์ กำหนด environment variables ให้ครบ และ import schema จาก `dbNorthwind.sql` การเลือกและตั้งค่า hosting ทำแยกโดยเจ้าของโปรเจกต์
