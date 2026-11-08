@@ -30,11 +30,17 @@
     shippers:{title:'บริษัทขนส่ง',desc:'จัดการบริษัทขนส่งและข้อมูลติดต่อ',endpoint:'shippers',fields:[['id','รหัสบริษัทขนส่ง','number',true],['name','ชื่อบริษัท','text',true],['phone','โทรศัพท์','tel',false]],cols:[['id','รหัส'],['name','บริษัทขนส่ง'],['phone','โทรศัพท์']]}
   };
   async function api(path,options={}){
-    const headers={'Accept':'application/json',...(options.body?{'Content-Type':'application/json'}:{}),...(token()?{'Authorization':`Bearer ${token()}`}:{})};
+    // Keep the token used by this request. An older in-flight request must not
+    // clear a newer token after a successful login.
+    const requestToken=token();
+    const headers={'Accept':'application/json',...(options.body?{'Content-Type':'application/json'}:{}),...(requestToken?{'Authorization':`Bearer ${requestToken}`}:{})};
     let response; try { response=await fetch(`${API}/${path}`,{...options,headers,body:options.body?JSON.stringify(options.body):undefined}); }
     catch { throw new Error('เชื่อมต่อระบบไม่ได้ กรุณาตรวจสอบการเชื่อมต่อและการตั้งค่าฐานข้อมูล'); }
     const data=await response.json().catch(()=>({}));
-    if(response.status===401 && path!=='auth/login'){sessionStorage.removeItem('nw_token');showAuth('เซสชันหมดอายุหรือไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบใหม่');throw new Error('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');}
+    if(response.status===401 && path!=='auth/login'){
+      if(token()===requestToken){sessionStorage.removeItem('nw_token');showAuth('เซสชันหมดอายุหรือไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบใหม่');}
+      throw new Error('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');
+    }
     if(!response.ok||data.status===false)throw new Error(data.error||'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง');
     return data;
   }
@@ -52,7 +58,7 @@
     }
   }
   async function showApp(){
-    if(!location.hash) location.hash='#dashboard';
+    if(!location.hash) history.replaceState(null,'','#dashboard');
     $('#loginView').classList.add('d-none');
     $('#appView').classList.remove('d-none');
     const u=user();
