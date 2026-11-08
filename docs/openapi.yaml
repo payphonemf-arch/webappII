@@ -61,7 +61,7 @@ paths:
     get:
       tags: [Reports]
       summary: Get order lines and popular product aggregates
-      description: Includes order_lines with customer, country, employee, shipper, product, category, quantity, current_unit_price, and estimated_line_total. Sales totals are estimates using current product prices.
+      description: Includes order_lines with customer, country, employee, shipper, product, category, quantity, current_unit_price, and estimated_line_total. popular_products also includes product_id, category, supplier, package unit, quantity, current_unit_price, and estimated_sales. Sales totals are estimates using current product prices.
       responses:
         '200': { $ref: '#/components/responses/Ok' }
         '401': { $ref: '#/components/responses/Unauthorized' }

@@ -66,8 +66,8 @@ Product list response `200` includes category and supplier names:
 {"status":true,"data":[{"id":1,"name":"Chai","supplier_id":1,"supplier_name":"Exotic Liquids","category_id":1,"category_name":"Beverages","unit":"10 boxes","price":18}],"total":1,"page":1,"limit":25}
 ```
 
-The reports response includes `order_lines` with order date, customer and country, employee, shipper, product and category, quantity, current unit price, and estimated line total. `popular_products` includes quantity, current unit price, and estimated sales. The dashboard and order list also include estimated totals. These totals use the product's **current** price because the legacy order detail table does not store the historical unit price; use them as estimates, not accounting records.
+The reports response includes `order_lines` with order date, customer and country, employee, shipper, product and category, quantity, current unit price, and estimated line total. `popular_products` includes product ID, category, supplier, package unit, quantity, current unit price, and estimated sales. The dashboard and order list also include estimated totals. These totals use the product's **current** price because the legacy order detail table does not store the historical unit price; use them as estimates, not accounting records.
 
-The Reports screen exports detailed order lines or popular product summaries as UTF-8 CSV files. The order detail CSV includes customer, country, employee, shipper, product and category, quantity, current unit price, and estimated line total.
+The Reports screen exports detailed order lines or popular product summaries as UTF-8 CSV files. The order detail CSV includes customer, country, employee, shipper, product and category, quantity, current unit price, and estimated line total. The popular products CSV also includes product ID, supplier, and package unit.
 
 Errors return `{ "status": false, "error": "..." }`. Common HTTP codes: `401` missing/expired token or bad credentials, `404` unknown resource, `422` invalid request fields, `500` database/setup failure.
