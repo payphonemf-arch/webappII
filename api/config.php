@@ -13,8 +13,9 @@ if (is_file($envFile) && is_readable($envFile)) {
     }
 }
 
-// Auto-detect connection URL from platforms like Railway / Render
-$dbUrl = getenv('DATABASE_URL') ?: (getenv('MYSQL_URL') ?: (getenv('MYSQL_PRIVATE_URL') ?: (getenv('MYSQL_PUBLIC_URL') ?: getenv('DATABASE_PUBLIC_URL'))));
+// Railway MySQL variables. Prefer the service variables, then fall back to a
+// connection URL, local .env values, and finally development defaults.
+$dbUrl = getenv('MYSQL_URL') ?: (getenv('DATABASE_URL') ?: (getenv('MYSQL_PRIVATE_URL') ?: (getenv('MYSQL_PUBLIC_URL') ?: getenv('DATABASE_PUBLIC_URL'))));
 $urlHost = null; $urlPort = null; $urlUser = null; $urlPass = null; $urlName = null;
 if ($dbUrl) {
     $parsed = parse_url($dbUrl);
