@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const API = 'api/v1';
+  const API = window.location.pathname.includes('/public/') ? '../api/v1' : 'api/v1';
   const $ = (s, root=document) => root.querySelector(s);
   const esc = (v='') => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const token = () => sessionStorage.getItem('nw_token');
@@ -52,6 +52,7 @@
     }
   }
   async function showApp(){
+    if(!location.hash) location.hash='#dashboard';
     $('#loginView').classList.add('d-none');
     $('#appView').classList.remove('d-none');
     const u=user();
