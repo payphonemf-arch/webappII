@@ -118,6 +118,6 @@ CREATE TABLE `tb_users` (
   `i_usr_uname` varchar(15) NOT NULL,
   `i_usr_pwd` varchar(255) NOT NULL,
   PRIMARY KEY (`i_usr_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `tb_users` VALUES (1,'admin','$2y$10$/cvHpJDUQNdxWLG2VsSKheAf2Yw8fpq3M2lohOd9oDqng3fgARrES'),(2,'mango','$2y$10$wDtpk5PU6UFJWqqfWX7gFeb75OLUJH4tFDFfK46RDT0i4iXopoaTu'),(3,'banana','$2y$10$p4NtG5moWE1RMUAupmSBn.bNHn2lD4uavGb9elKO2EG4NRyh/kdPS');
+INSERT INTO `tb_users` VALUES (1,'admin','$2y$10$/cvHpJDUQNdxWLG2VsSKheAf2Yw8fpq3M2lohOd9oDqng3fgARrES'),(2,'mango','$2y$10$wDtpk5PU6UFJWqqfWX7gFeb75OLUJH4tFDFfK46RDT0i4iXopoaTu'),(3,'banana','$2y$10$p4NtG5moWE1RMUAupmSBn.bNHn2lD4uavGb9elKO2EG4NRyh/kdPS'),(4,'admincpe','$2y$10$/cvHpJDUQNdxWLG2VsSKheAf2Yw8fpq3M2lohOd9oDqng3fgARrES');
