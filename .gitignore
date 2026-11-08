@@ -1,3 +1,28 @@
+# Local secrets and environment files
 .env
+.env.*
+!.env.example
+
+# Local database exports and backup copies
 recovered_db_northwind.sql
+*.sql.gz
+*.dump.sql
+
+# Dependencies, caches, and generated files
+node_modules/
+vendor/
 .phpunit.cache/
+coverage/
+tmp/
+temp/
+*.log
+npm-debug.log*
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local reference screenshots in the project root
+/image*.png
