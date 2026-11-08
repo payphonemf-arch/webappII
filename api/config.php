@@ -14,7 +14,7 @@ if (is_file($envFile) && is_readable($envFile)) {
 }
 
 // Auto-detect connection URL from platforms like Railway / Render
-$dbUrl = getenv('DATABASE_URL') ?: (getenv('MYSQL_URL') ?: getenv('MYSQL_PRIVATE_URL'));
+$dbUrl = getenv('DATABASE_URL') ?: (getenv('MYSQL_URL') ?: (getenv('MYSQL_PRIVATE_URL') ?: (getenv('MYSQL_PUBLIC_URL') ?: getenv('DATABASE_PUBLIC_URL'))));
 $urlHost = null; $urlPort = null; $urlUser = null; $urlPass = null; $urlName = null;
 if ($dbUrl) {
     $parsed = parse_url($dbUrl);
@@ -28,9 +28,9 @@ if ($dbUrl) {
 }
 
 $host = getenv('MYSQLHOST') ?: (getenv('MYSQL_HOST') ?: (getenv('DB_HOST') ?: ($urlHost ?: '127.0.0.1')));
-$port = (int)(getenv('MYSQLPORT') ?: (getenv('DB_PORT') ?: ($urlPort ?: 3306)));
+$port = (int)(getenv('MYSQLPORT') ?: (getenv('MYSQL_PORT') ?: (getenv('DB_PORT') ?: ($urlPort ?: 3306))));
 $db   = getenv('MYSQLDATABASE') ?: (getenv('MYSQL_DATABASE') ?: (getenv('DB_NAME') ?: ($urlName ?: 'railway')));
-$user = getenv('MYSQLUSER') ?: (getenv('DB_USER') ?: ($urlUser ?: 'root'));
+$user = getenv('MYSQLUSER') ?: (getenv('MYSQL_USER') ?: (getenv('DB_USER') ?: ($urlUser ?: 'root')));
 $pass = getenv('MYSQLPASSWORD') ?: (getenv('MYSQL_PASSWORD') ?: (getenv('DB_PASS') ?: ($urlPass ?: (getenv('MYSQL_ROOT_PASSWORD') ?: ''))));
 
 return [
@@ -45,4 +45,3 @@ return [
     'jwt_secret' => getenv('JWT_SECRET') ?: 'northwind-default-bms-secret-key-replace-if-needed-32chars',
     'token_ttl' => 28800,
 ];
-

@@ -1,6 +1,18 @@
-Options -Indexes
+Options -Indexes +FollowSymLinks
 DirectoryIndex index.php
+
+<IfModule mod_authz_core.c>
+  CGIPassAuth On
+</IfModule>
+
+SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
+
 RewriteEngine On
+
+# Ensure Authorization header is passed to PHP
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 RewriteRule ^\.git(?:/|$) - [F,L]
 
 # Keep the API front controller separate from the static application assets.

@@ -34,13 +34,23 @@ final class Database
     {
         try {
             $stmt = $pdo->query("SHOW TABLES LIKE 'tb_users'");
-            if ($stmt && $stmt->fetchColumn() === false) {
+            $hasUsersTable = $stmt && $stmt->fetchColumn() !== false;
+            if (!$hasUsersTable) {
                 $sqlFile = dirname(__DIR__, 2) . '/dbNorthwind.sql';
                 if (is_file($sqlFile)) {
                     $sql = file_get_contents($sqlFile);
                     if ($sql) {
                         $pdo->exec($sql);
                     }
+                }
+            } else {
+                $count = (int)$pdo->query("SELECT COUNT(*) FROM tb_users")->fetchColumn();
+                if ($count === 0) {
+                    $pdo->exec("INSERT INTO tb_users (i_usr_id, i_usr_uname, i_usr_pwd) VALUES
+                        (1,'admin','$2y$10$/cvHpJDUQNdxWLG2VsSKheAf2Yw8fpq3M2lohOd9oDqng3fgARrES'),
+                        (2,'mango','$2y$10$wDtpk5PU6UFJWqqfWX7gFeb75OLUJH4tFDFfK46RDT0i4iXopoaTu'),
+                        (3,'banana','$2y$10$p4NtG5moWE1RMUAupmSBn.bNHn2lD4uavGb9elKO2EG4NRyh/kdPS'),
+                        (4,'admincpe','$2y$10$/cvHpJDUQNdxWLG2VsSKheAf2Yw8fpq3M2lohOd9oDqng3fgARrES')");
                 }
             }
         } catch (\Throwable $e) {

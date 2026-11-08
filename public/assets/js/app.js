@@ -34,12 +34,33 @@
     let response; try { response=await fetch(`${API}/${path}`,{...options,headers,body:options.body?JSON.stringify(options.body):undefined}); }
     catch { throw new Error('เชื่อมต่อระบบไม่ได้ กรุณาตรวจสอบการเชื่อมต่อและการตั้งค่าฐานข้อมูล'); }
     const data=await response.json().catch(()=>({}));
-    if(response.status===401 && path!=='auth/login'){sessionStorage.removeItem('nw_token');showAuth();throw new Error('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');}
+    if(response.status===401 && path!=='auth/login'){sessionStorage.removeItem('nw_token');showAuth('เซสชันหมดอายุหรือไม่มีสิทธิ์เข้าถึง กรุณาเข้าสู่ระบบใหม่');throw new Error('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');}
     if(!response.ok||data.status===false)throw new Error(data.error||'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง');
     return data;
   }
-  function showAuth(){ $('#appView').classList.add('d-none');$('#loginView').classList.remove('d-none'); }
-  function showApp(){ $('#loginView').classList.add('d-none');$('#appView').classList.remove('d-none');const u=user();$('#userName').textContent=u.username||'Admin';$('#userAvatar').textContent=(u.username||'A').slice(0,1).toUpperCase();$('#topAvatar').textContent=(u.username||'A').slice(0,1).toUpperCase();$('#todayDate').textContent=new Intl.DateTimeFormat(window.nwI18n?.language()==='th'?'th-TH':'en-US',{dateStyle:'medium'}).format(new Date());route(); }
+  function showAuth(errorMessage=''){
+    $('#appView').classList.add('d-none');
+    $('#loginView').classList.remove('d-none');
+    const err = $('#loginError');
+    if (err) {
+      if (errorMessage) {
+        err.textContent = errorMessage;
+        err.classList.remove('d-none');
+      } else {
+        err.classList.add('d-none');
+      }
+    }
+  }
+  async function showApp(){
+    $('#loginView').classList.add('d-none');
+    $('#appView').classList.remove('d-none');
+    const u=user();
+    $('#userName').textContent=u.username||'Admin';
+    $('#userAvatar').textContent=(u.username||'A').slice(0,1).toUpperCase();
+    $('#topAvatar').textContent=(u.username||'A').slice(0,1).toUpperCase();
+    $('#todayDate').textContent=new Intl.DateTimeFormat(window.nwI18n?.language()==='th'?'th-TH':'en-US',{dateStyle:'medium'}).format(new Date());
+    await route();
+  }
   function notify(message,type='success') { const id=`toast-${Date.now()}`;$('#toastContainer').insertAdjacentHTML('beforeend',`<div id="${id}" class="toast align-items-center text-bg-${type==='success'?'light':'danger'}" role="status"><div class="d-flex"><div class="toast-body">${esc(message)}</div><button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="ปิด"></button></div></div>`);const el=document.getElementById(id);new bootstrap.Toast(el,{delay:3000}).show();el.addEventListener('hidden.bs.toast',()=>el.remove()); }
   function heading(title,desc,button=''){return `<div class="page-heading"><div><span class="eyebrow">NORTHWIND / ${esc(title.toUpperCase())}</span><h1>${esc(title)}</h1><p>${esc(desc)}</p></div>${button}</div>`;}
   async function route(){const key=(location.hash.slice(1)||'dashboard').split('/')[0];const pageName=titles[key]?key:'dashboard';page=1;document.querySelectorAll('.main-nav a').forEach(a=>a.classList.toggle('active',a.dataset.page===pageName));$('#breadcrumb').textContent=titles[pageName];$('#sidebar').classList.remove('open');$('#pageContent').innerHTML='<div class="loading-state">กำลังโหลดข้อมูล...</div>';try{if(pageName==='dashboard')await renderDashboard();else if(pageName==='orders')await renderOrders();else if(pageName==='reports')await renderReports();else await renderEntity(pageName);}catch(e){$('#pageContent').innerHTML=`<div class="panel empty-state"><div class="mb-2">เชื่อมต่อข้อมูลไม่สำเร็จ</div><span>${esc(e.message)}</span><div class="mt-3"><button class="btn btn-outline-secondary" onclick="location.reload()">ลองใหม่</button></div></div>`;}}
@@ -89,7 +110,7 @@
   };
   document.addEventListener('click',event=>{const button=event.target.closest('[data-action="export-products"]');if(button)exportCsv('products');});
 
-  $('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const err=$('#loginError');err.classList.add('d-none');const data=Object.fromEntries(new FormData(e.currentTarget));try{const res=await api('auth/login',{method:'POST',body:data});sessionStorage.setItem('nw_token',res.data.token);sessionStorage.setItem('nw_user',JSON.stringify(res.data.user));showApp();}catch(ex){err.textContent=ex.message;err.classList.remove('d-none');}});
+  $('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const err=$('#loginError');err.classList.add('d-none');const btn=e.currentTarget.querySelector('button[type="submit"]');if(btn)btn.disabled=true;const data=Object.fromEntries(new FormData(e.currentTarget));try{const res=await api('auth/login',{method:'POST',body:data});sessionStorage.setItem('nw_token',res.data.token);sessionStorage.setItem('nw_user',JSON.stringify(res.data.user));await showApp();}catch(ex){err.textContent=ex.message;err.classList.remove('d-none');}finally{if(btn)btn.disabled=false;}});
   $('#logoutBtn').addEventListener('click',()=>{sessionStorage.removeItem('nw_token');sessionStorage.removeItem('nw_user');showAuth();});$('#menuToggle').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));window.addEventListener('hashchange',route);
   window.addEventListener('nw-language-change',()=>{if(token()){const locale=window.nwI18n?.language()==='th'?'th-TH':'en-US';document.getElementById('todayDate').textContent=new Intl.DateTimeFormat(locale,{dateStyle:'medium'}).format(new Date());route();}});
   if(token())showApp();else showAuth();

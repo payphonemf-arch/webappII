@@ -22,9 +22,38 @@ final class Api
         $head=$enc(['typ'=>'JWT','alg'=>'HS256']); $payload=$enc($claims);
         return $head.'.'.$payload.'.'.rtrim(strtr(base64_encode(hash_hmac('sha256',$head.'.'.$payload,$this->config['jwt_secret'],true)), '+/', '-_'),'=');
     }
+    private function getAuthorizationHeader(): string
+    {
+        if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+            return (string)$_SERVER['HTTP_AUTHORIZATION'];
+        }
+        if (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+            return (string)$_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+        }
+        if (function_exists('apache_request_headers')) {
+            $headers = apache_request_headers();
+            foreach ($headers as $k => $v) {
+                if (strcasecmp((string)$k, 'Authorization') === 0) {
+                    return (string)$v;
+                }
+            }
+        }
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+            foreach ($headers as $k => $v) {
+                if (strcasecmp((string)$k, 'Authorization') === 0) {
+                    return (string)$v;
+                }
+            }
+        }
+        if (!empty($_SERVER['Authorization'])) {
+            return (string)$_SERVER['Authorization'];
+        }
+        return '';
+    }
     private function auth(): array
     {
-        $h=$_SERVER['HTTP_AUTHORIZATION']??'';
+        $h = $this->getAuthorizationHeader();
         if (!preg_match('/^Bearer\s+(.+)$/i',$h,$m)) $this->respond(['status'=>false,'error'=>'Authentication required'],401);
         $parts=explode('.',$m[1]);
         if(count($parts)!==3) $this->respond(['status'=>false,'error'=>'Invalid token'],401);
@@ -38,7 +67,26 @@ final class Api
         header('Access-Control-Allow-Headers: Content-Type, Authorization'); header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         if(($_SERVER['REQUEST_METHOD']??'GET')==='OPTIONS'){http_response_code(204);return;}
         $path=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH)?:'/';
-        if($path==='/health'||$path==='/health/'){ $this->respond(['status'=>true,'service'=>'northwind-bms']); }
+        if($path==='/health'||$path==='/health/'){
+            $dbStatus = 'disconnected';
+            $dbError = null;
+            $userCount = 0;
+            try {
+                $db = $this->db();
+                $dbStatus = 'connected';
+                $stmt = $db->query("SELECT COUNT(*) FROM tb_users");
+                $userCount = (int)$stmt->fetchColumn();
+            } catch (\Throwable $e) {
+                $dbError = $e->getMessage();
+            }
+            $this->respond([
+                'status' => true,
+                'service' => 'northwind-bms',
+                'database' => $dbStatus,
+                'users_count' => $userCount,
+                'error' => $dbError,
+            ]);
+        }
         if($path==='/'||$path==='/index.php'){require dirname(__DIR__,2).'/public/index.html';return;}
         if(!str_starts_with($path,'/api/v1/')){$this->respond(['status'=>false,'error'=>'Not found'],404);}
         try {
