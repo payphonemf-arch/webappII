@@ -1,0 +1,3 @@
+.env
+recovered_db_northwind.sql
+.phpunit.cache/

@@ -1,0 +1,333 @@
+openapi: 3.1.0
+info:
+  title: Northwind BMS API
+  version: 1.0.0
+  description: REST API for the Northwind Business Management System.
+servers:
+  - url: ../api/v1
+    description: Current deployment (relative to the docs directory)
+tags:
+  - name: Authentication
+  - name: Dashboard
+  - name: Products
+  - name: Categories
+  - name: Customers
+  - name: Suppliers
+  - name: Employees
+  - name: Shippers
+  - name: Orders
+  - name: Reports
+security:
+  - bearerAuth: []
+paths:
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Sign in and receive a JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string, example: admin }
+                password: { type: string, format: password }
+      responses:
+        '200':
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /auth/me:
+    get:
+      tags: [Authentication]
+      summary: Get the current user
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Get KPI counts, estimated sales, and dashboard summaries
+      description: Estimated sales use current product prices because historical unit prices are not stored in the legacy order details.
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /reports:
+    get:
+      tags: [Reports]
+      summary: Get order lines and popular product aggregates
+      description: Includes order_lines with customer, country, employee, shipper, product, category, quantity, current_unit_price, and estimated_line_total. Sales totals are estimates using current product prices.
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /products:
+    get:
+      tags: [Products]
+      summary: List products with category and supplier names
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 25 } }
+        - { name: search, in: query, schema: { type: string } }
+        - { name: category_id, in: query, schema: { type: integer } }
+      responses:
+        '200': { $ref: '#/components/responses/List' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Products]
+      summary: Create a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductInput' }
+      responses:
+        '201': { $ref: '#/components/responses/Created' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /products/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get:
+      tags: [Products]
+      summary: Get a product
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Products]
+      summary: Update a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductInput' }
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+    delete:
+      tags: [Products]
+      summary: Delete a product
+      responses:
+        '200': { $ref: '#/components/responses/Ok' }
+  /categories:
+    get: { tags: [Categories], summary: List categories, responses: { '200': { $ref: '#/components/responses/List' } } }
+    post:
+      tags: [Categories]
+      summary: Create a category
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CategoryInput' } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /categories/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get: { tags: [Categories], summary: Get a category, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+    put:
+      tags: [Categories]
+      summary: Update a category
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CategoryInput' } } } }
+      responses: { '200': { $ref: '#/components/responses/Ok' } }
+    delete: { tags: [Categories], summary: Delete a category, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+  /customers:
+    get: { tags: [Customers], summary: List customers, responses: { '200': { $ref: '#/components/responses/List' } } }
+    post:
+      tags: [Customers]
+      summary: Create a customer
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CustomerInput' } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /customers/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get: { tags: [Customers], summary: Get a customer, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+    put:
+      tags: [Customers]
+      summary: Update a customer
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CustomerInput' } } } }
+      responses: { '200': { $ref: '#/components/responses/Ok' } }
+    delete: { tags: [Customers], summary: Delete a customer, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+  /suppliers:
+    get: { tags: [Suppliers], summary: List suppliers, responses: { '200': { $ref: '#/components/responses/List' } } }
+    post:
+      tags: [Suppliers]
+      summary: Create a supplier
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/SupplierInput' } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /suppliers/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get: { tags: [Suppliers], summary: Get a supplier, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+    put:
+      tags: [Suppliers]
+      summary: Update a supplier
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/SupplierInput' } } } }
+      responses: { '200': { $ref: '#/components/responses/Ok' } }
+    delete: { tags: [Suppliers], summary: Delete a supplier, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+  /employees:
+    get: { tags: [Employees], summary: List employees, responses: { '200': { $ref: '#/components/responses/List' } } }
+    post:
+      tags: [Employees]
+      summary: Create an employee
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/EmployeeInput' } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /employees/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get: { tags: [Employees], summary: Get an employee, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+    put:
+      tags: [Employees]
+      summary: Update an employee
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/EmployeeInput' } } } }
+      responses: { '200': { $ref: '#/components/responses/Ok' } }
+    delete: { tags: [Employees], summary: Delete an employee, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+  /shippers:
+    get: { tags: [Shippers], summary: List shippers, responses: { '200': { $ref: '#/components/responses/List' } } }
+    post:
+      tags: [Shippers]
+      summary: Create a shipper
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ShipperInput' } } } }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /shippers/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get: { tags: [Shippers], summary: Get a shipper, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+    put:
+      tags: [Shippers]
+      summary: Update a shipper
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ShipperInput' } } } }
+      responses: { '200': { $ref: '#/components/responses/Ok' } }
+    delete: { tags: [Shippers], summary: Delete a shipper, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+  /orders:
+    get:
+      tags: [Orders]
+      summary: List orders with item counts and estimated totals
+      description: Estimated totals use current product prices and are not historical accounting values.
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: limit, in: query, schema: { type: integer, default: 25, maximum: 100 } }
+      responses: { '200': { $ref: '#/components/responses/List' } }
+    post:
+      tags: [Orders]
+      summary: Create an order with an optional first line item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customer_id, employee_id, shipper_id]
+              properties:
+                customer_id: { type: integer }
+                employee_id: { type: integer }
+                shipper_id: { type: integer }
+                order_date: { type: string, example: '8/11/2026' }
+                product_id: { type: integer }
+                quantity: { type: integer, minimum: 1 }
+      responses: { '201': { $ref: '#/components/responses/Created' } }
+  /orders/{id}:
+    parameters: [{ $ref: '#/components/parameters/id' }]
+    get: { tags: [Orders], summary: Get order and line items, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+    delete: { tags: [Orders], summary: Delete order and line items, responses: { '200': { $ref: '#/components/responses/Ok' } } }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        status: { type: boolean }
+        data: {}
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+        error: { type: string }
+    LoginResponse:
+      type: object
+      properties:
+        status: { type: boolean, const: true }
+        data:
+          type: object
+          properties:
+            token: { type: string }
+            user:
+              type: object
+              properties:
+                id: { type: integer }
+                username: { type: string }
+    ProductInput:
+      type: object
+      required: [name, supplier_id, category_id, unit, price]
+      properties:
+        name: { type: string, example: Chai }
+        supplier_id: { type: integer, example: 1 }
+        category_id: { type: integer, example: 1 }
+        unit: { type: string, example: '10 boxes x 20 bags' }
+        price: { type: number, example: 18 }
+    CategoryInput:
+      type: object
+      required: [name, description]
+      properties:
+        name: { type: string }
+        description: { type: string }
+    CustomerInput:
+      type: object
+      properties:
+        name: { type: string }
+        contact: { type: string }
+        address: { type: string }
+        city: { type: string }
+        postal_code: { type: string }
+        country: { type: string }
+    SupplierInput:
+      type: object
+      properties:
+        name: { type: string }
+        contact: { type: string }
+        address: { type: string }
+        city: { type: string }
+        postal_code: { type: string }
+        country: { type: string }
+        phone: { type: string }
+    EmployeeInput:
+      type: object
+      properties:
+        first_name: { type: string }
+        last_name: { type: string }
+        birth_date: { type: string }
+        photo: { type: string }
+        notes: { type: string }
+    ShipperInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        phone: { type: string }
+  responses:
+    Ok:
+      description: Successful request
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiResponse' }
+    List:
+      description: Successful paginated list
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiResponse' }
+    Created:
+      description: Resource created
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiResponse' }
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiResponse' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiResponse' }

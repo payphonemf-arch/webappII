@@ -1,0 +1,9 @@
+{
+  "name": "northwind-bms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local PHP development launcher for Northwind BMS",
+  "scripts": {
+    "dev": "node scripts/dev.js"
+  }
+}
