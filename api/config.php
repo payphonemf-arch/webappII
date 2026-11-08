@@ -27,13 +27,19 @@ if ($dbUrl) {
     }
 }
 
+$host = getenv('MYSQLHOST') ?: (getenv('DB_HOST') ?: ($urlHost ?: '127.0.0.1'));
+$port = (int)(getenv('MYSQLPORT') ?: (getenv('DB_PORT') ?: ($urlPort ?: 3306)));
+$db   = getenv('MYSQLDATABASE') ?: (getenv('DB_NAME') ?: ($urlName ?: 'railway'));
+$user = getenv('MYSQLUSER') ?: (getenv('DB_USER') ?: ($urlUser ?: 'root'));
+$pass = getenv('MYSQLPASSWORD') ?: (getenv('DB_PASS') ?: ($urlPass ?: (getenv('MYSQL_ROOT_PASSWORD') ?: '')));
+
 return [
     'db' => [
-        'host' => getenv('DB_HOST') ?: ($urlHost ?: (getenv('MYSQLHOST') ?: '127.0.0.1')),
-        'port' => (int)(getenv('DB_PORT') ?: ($urlPort ?: (getenv('MYSQLPORT') ?: 3306))),
-        'name' => getenv('DB_NAME') ?: ($urlName ?: (getenv('MYSQLDATABASE') ?: 'railway')),
-        'user' => getenv('DB_USER') ?: ($urlUser ?: (getenv('MYSQLUSER') ?: 'root')),
-        'pass' => getenv('DB_PASS') ?: ($urlPass ?: (getenv('MYSQLPASSWORD') ?: (getenv('MYSQL_ROOT_PASSWORD') ?: ''))),
+        'host' => $host,
+        'port' => $port,
+        'name' => $db,
+        'user' => $user,
+        'pass' => $pass,
         'charset' => 'utf8mb4',
     ],
     'jwt_secret' => getenv('JWT_SECRET') ?: 'northwind-default-bms-secret-key-replace-if-needed-32chars',
