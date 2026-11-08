@@ -4,6 +4,7 @@ RewriteEngine On
 RewriteRule ^\.git(?:/|$) - [F,L]
 
 # Keep the API front controller separate from the static application assets.
+RewriteRule ^health(?:/.*)?$ index.php [L]
 RewriteRule ^api/v1(?:/.*)?$ api/index.php [QSA,L]
 RewriteRule ^$ index.php [L]
 

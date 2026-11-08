@@ -45,6 +45,23 @@ Web-app-II/
 └── package.json                   # คำสั่ง npm สำหรับรัน local
 ```
 
+## Deploy บน Railway
+
+โปรเจกต์นี้มี `Dockerfile` และ `railway.toml` พร้อมใช้งาน ให้สร้างบริการจาก repository นี้ด้วย **Deploy from GitHub Repo** แล้ว Railway จะ build ด้วย Dockerfile อัตโนมัติ `PORT` จะถูกส่งให้ Apache และ health check ใช้ `GET /health`
+
+เพิ่ม Variable Reference จากบริการ MySQL ไปยังบริการ `webapp` อย่างน้อยดังนี้:
+
+```text
+MYSQLHOST=${{MySQL.MYSQLHOST}}
+MYSQLPORT=${{MySQL.MYSQLPORT}}
+MYSQLDATABASE=${{MySQL.MYSQLDATABASE}}
+MYSQLUSER=${{MySQL.MYSQLUSER}}
+MYSQLPASSWORD=${{MySQL.MYSQLPASSWORD}}
+JWT_SECRET=<สุ่มค่าอย่างน้อย 32 ตัวอักษร>
+```
+
+ถ้า Railway แสดงชื่อตัวแปรเป็น `MYSQL_DATABASE` หรือ `MYSQL_ROOT_PASSWORD` ก็ใช้ชื่อนั้นได้ โค้ดรองรับทั้งรูปแบบ Railway และ `DB_*` ใน `.env.example` แล้ว หลัง deploy ให้ตรวจ `https://<โดเมนของบริการ>/health` ต้องได้ JSON ที่มี `status: true` ก่อนทดสอบ login และ API
+
 ## Deploy บน Render
 
 โปรเจกต์มี `Dockerfile` สำหรับ Render แล้ว ให้สร้างบริการแบบ **Web Service** จาก repository นี้ และตั้งค่า:

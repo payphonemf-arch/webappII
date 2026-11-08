@@ -27,11 +27,11 @@ if ($dbUrl) {
     }
 }
 
-$host = getenv('MYSQLHOST') ?: (getenv('DB_HOST') ?: ($urlHost ?: '127.0.0.1'));
+$host = getenv('MYSQLHOST') ?: (getenv('MYSQL_HOST') ?: (getenv('DB_HOST') ?: ($urlHost ?: '127.0.0.1')));
 $port = (int)(getenv('MYSQLPORT') ?: (getenv('DB_PORT') ?: ($urlPort ?: 3306)));
-$db   = getenv('MYSQLDATABASE') ?: (getenv('DB_NAME') ?: ($urlName ?: 'railway'));
+$db   = getenv('MYSQLDATABASE') ?: (getenv('MYSQL_DATABASE') ?: (getenv('DB_NAME') ?: ($urlName ?: 'railway')));
 $user = getenv('MYSQLUSER') ?: (getenv('DB_USER') ?: ($urlUser ?: 'root'));
-$pass = getenv('MYSQLPASSWORD') ?: (getenv('DB_PASS') ?: ($urlPass ?: (getenv('MYSQL_ROOT_PASSWORD') ?: '')));
+$pass = getenv('MYSQLPASSWORD') ?: (getenv('MYSQL_PASSWORD') ?: (getenv('DB_PASS') ?: ($urlPass ?: (getenv('MYSQL_ROOT_PASSWORD') ?: ''))));
 
 return [
     'db' => [

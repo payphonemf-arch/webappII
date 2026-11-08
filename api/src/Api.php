@@ -38,6 +38,7 @@ final class Api
         header('Access-Control-Allow-Headers: Content-Type, Authorization'); header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
         if(($_SERVER['REQUEST_METHOD']??'GET')==='OPTIONS'){http_response_code(204);return;}
         $path=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH)?:'/';
+        if($path==='/health'||$path==='/health/'){ $this->respond(['status'=>true,'service'=>'northwind-bms']); }
         if($path==='/'||$path==='/index.php'){require dirname(__DIR__,2).'/public/index.html';return;}
         if(!str_starts_with($path,'/api/v1/')){$this->respond(['status'=>false,'error'=>'Not found'],404);}
         try {
